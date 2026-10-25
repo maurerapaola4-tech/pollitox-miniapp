@@ -1,4 +1,71 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>POLLITOX PRO</title><script src="https://telegram.org/js/telegram-web-app.js"></script><style>*{box-sizing:border-box}body{margin:0;font:14px system-ui,Arial;background:#081426;color:#eaf5ff}.app{max-width:700px;margin:auto;padding:20px 15px}h1{color:#ffd338;margin:0}h2{font-size:18px}.sub{color:#94b2cb;font-size:12px}.panel{background:#152a42;border:1px solid #2d4661;padding:16px;border-radius:18px;margin:16px 0}.btn{background:#25cde3;border:0;border-radius:10px;padding:12px;font-weight:700;color:#051e30;cursor:pointer}.btn:disabled{opacity:.5}.btn2{background:#254460;color:#fff;border:1px solid #43617a}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.product{display:flex;gap:12px;align-items:center;padding:12px;background:#10233a;border:1px solid #29435e;border-radius:13px;margin:8px 0}.product img{width:75px;height:85px;object-fit:cover;border-radius:8px}.product label{flex:1}.product b,.product small{display:block}.product small{color:#b5ccdf;margin-top:4px}input[type=checkbox]{width:20px;height:20px;accent-color:#ffd338}.field{width:100%;background:#091b30;color:#fff;border:1px solid #43617a;border-radius:9px;padding:12px}textarea{min-height:90px}.hidden{display:none}.warn{color:#ffd88e}.count{color:#ffd338;font-weight:700}.note{color:#8eaac0;font-size:11px}</style></head><body><main class="app"><h1>🐣 POLLITOX PRO</h1><div class="sub">CENTRO INTELIGENTE DE EXTRACCIÓN</div><section id="home" class="panel"><h2>⚡ Extraer artículos</h2><p>Pega el enlace de tu carrito SHEIN para iniciar la extracción desde Telegram.</p><input id="link" class="field" placeholder="https://onelink.shein.com/..."><div class="controls"><button class="btn" id="extract">⚡ EXTRAER ARTÍCULOS</button></div><p id="homeStatus" class="note">Acceso exclusivo para usuarios autorizados.</p><p class="note">❔ Ayuda: después de extraer, recibirás los archivos y el botón GESTIONAR CARRITO en el chat del bot.</p></section><section id="manager" class="panel hidden"><h2>🛒 GESTIONAR CARRITO</h2><p id="status" class="warn">Cargando artículos de tu extracción…</p><input id="search" class="field" placeholder="🔎 Buscar por nombre o ID"><div class="controls"><button class="btn btn2" id="all">☑ Seleccionar todos</button><button class="btn btn2" id="none">☐ Quitar selección</button><button class="btn btn2" id="remove">🗑 Eliminar seleccionados</button></div><div id="count" class="count">0 artículos</div><div id="products"></div><div class="controls"><button class="btn" id="visor">🌐 Generar visor</button><button class="btn" id="csv">📊 Descargar CSV</button></div></section></main><script>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#081426">
+<title>POLLITOX PRO · Extraer artículos</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:dark;--ink:#071426;--surface:#10253d;--line:#31506a;--muted:#abc2d3;--gold:#ffd128;--aqua:#37d9e0}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 85% -15%,#20436a 0,transparent 52%),radial-gradient(ellipse at -25% 65%,#103e50 0,transparent 52%),#071426;color:#f4f8ff;font:14px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+.app{width:min(100%,760px);margin:auto;padding:18px 18px 42px}
+.brand{display:flex;align-items:center;gap:10px;margin:0 0 18px}
+.brand-mark{display:grid;place-items:center;width:37px;height:37px;flex:none;border:1px solid #ffd96855;border-radius:12px;background:#ffda6330;font-size:22px}
+.brand-name{font-size:16px;font-weight:900;letter-spacing:.04em;line-height:1.1}.brand-name span{color:var(--gold)}
+.brand-name small{display:block;margin-top:4px;color:#8dacbf;font-size:9px;font-weight:700;letter-spacing:.13em}
+.brand-tag{margin-left:auto;border:1px solid #2b676c;border-radius:30px;padding:5px 9px;background:#1040486b;color:#8df5e4;font-size:9px;font-weight:800;white-space:nowrap}
+.hero{position:relative;overflow:hidden;border:1px solid #395976;border-radius:24px;background:linear-gradient(145deg,#1a3957 0%,#11263e 53%,#0a1c31 100%);box-shadow:0 20px 60px #010b1e99}
+.hero:before{content:"";position:absolute;right:-95px;top:-100px;width:285px;height:285px;border-radius:50%;background:radial-gradient(circle,#30cadf48 0,transparent 70%);pointer-events:none}
+.hero:after{content:"";position:absolute;inset:0;background-image:radial-gradient(#93c7d72c 1px,transparent 1px);background-size:23px 23px;mask-image:linear-gradient(90deg,transparent 30%,#000);pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:23px 23px 19px}
+.hero-copy{min-width:0}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;margin-bottom:8px;color:#83ece8;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.eyebrow:before{content:"";width:6px;height:6px;border-radius:50%;background:#5df8cf;box-shadow:0 0 9px #5df8cf}
+h1{margin:0;color:#fff;font-size:clamp(26px,5vw,39px);font-weight:900;line-height:1.04;letter-spacing:-.045em}
+h1 span{color:var(--gold)}
+.intro{max-width:420px;margin:11px 0 0;color:#c3d9e5;font-size:12px;line-height:1.55}
+.mascot{display:grid;place-items:center;flex:none;width:108px;height:108px;border:1px solid #7dc7d94a;border-radius:28px;background:linear-gradient(145deg,#284b68,#132d49);box-shadow:inset 0 1px #ffffff24,0 12px 30px #00112780;transform:rotate(4deg)}
+.mascot svg{width:92px;height:92px;filter:drop-shadow(0 9px 7px #05192f80);transform:rotate(-4deg)}
+.entry{margin:0 15px;border:1px solid #46677d;border-radius:18px;padding:17px;background:linear-gradient(150deg,#142e48,#0a2037);box-shadow:0 9px 25px #051426a8}
+.entry label{display:block;margin-bottom:9px;color:#eaf5ff;font-size:12px;font-weight:800}
+.field{width:100%;min-height:47px;border:1px solid #55738b;border-radius:10px;padding:11px 13px;background:#071a30;color:#fff;font:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+.field::placeholder{color:#819cb3}.field:focus{border-color:#69e9e7;box-shadow:0 0 0 3px #3bd9d930}
+.btn{border:0;border-radius:10px;padding:11px 15px;background:var(--aqua);color:#062436;font:inherit;font-weight:800;cursor:pointer;transition:transform .2s,filter .2s}
+.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}.btn:active{transform:translateY(0)}.btn:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.btn:disabled{opacity:.5}
+.btn2{background:#254460;color:#fff;border:1px solid #43617a}
+.primary-action{display:flex;width:100%;align-items:center;justify-content:center;gap:10px;margin-top:10px;min-height:47px;background:linear-gradient(110deg,#ffe076,#ffc52c);box-shadow:0 8px 20px #ffce322c;color:#102438;font-size:13px;letter-spacing:.04em}
+.primary-action span{margin-left:auto;font-size:19px;font-weight:400;line-height:1}
+.primary-action .button-icon{margin-right:auto;font-size:16px}
+#homeStatus{min-height:16px;margin:9px 1px 0;color:#9eb7c9;font-size:10px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:16px 18px 18px}
+.step{display:flex;align-items:center;gap:8px;padding:3px 8px;color:#adc9d6;font-size:10px;line-height:1.25}
+.step+.step{border-left:1px solid #48657a}
+.step strong{display:grid;place-items:center;flex:none;width:23px;height:23px;border:1px solid #578092;border-radius:8px;color:#8ceee5;background:#214a5a;font-size:10px}
+.panel{background:#152a42;border:1px solid #2d4661;padding:18px;border-radius:20px;margin:16px 0}
+#manager h2{margin:0 0 8px;font-size:21px;color:#ffdc64}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.product{display:flex;gap:12px;align-items:center;padding:12px;background:#10233a;border:1px solid #29435e;border-radius:13px;margin:8px 0}
+.product img{width:75px;height:85px;object-fit:cover;border-radius:8px}
+.product label{flex:1}.product b,.product small{display:block}.product small{color:#b5ccdf;margin-top:4px}
+input[type=checkbox]{width:20px;height:20px;accent-color:#ffd338}
+.hidden{display:none}.warn{color:#ffd88e}.count{color:#ffd338;font-weight:700}
+@media(max-width:520px){.app{padding:15px 11px 32px}.brand{margin-bottom:14px}.hero{border-radius:19px}.hero-top{padding:20px 17px 17px}.mascot{width:79px;height:83px;border-radius:21px}.mascot svg{width:71px;height:71px}.eyebrow{font-size:9px}h1{font-size:27px}.intro{font-size:11px}.entry{margin:0 11px;padding:14px}.steps{margin:13px 10px 14px}.step{padding:2px 6px;font-size:9px;gap:5px}.step strong{width:19px;height:19px;font-size:9px}}
+@media(max-width:355px){.brand-tag{display:none}.mascot{width:64px;height:70px}.mascot svg{width:59px;height:59px}h1{font-size:23px}.step{font-size:8px}}
+@media(prefers-reduced-motion:reduce){.btn,.field{transition:none}}
+</style>
+</head>
+<body><main class="app">
+<header class="brand"><div class="brand-mark" aria-hidden="true">🐣</div><div class="brand-name">POLLITOX <span>PRO</span><small>CENTRO DE EXTRACCIÓN</small></div><div class="brand-tag">● ACCESO PRIVADO</div></header>
+<section id="home" class="hero">
+<div class="hero-top"><div class="hero-copy"><div class="eyebrow">SHEIN ID · AUTOMATIZACIÓN</div><h1>Tu carrito.<br><span>En buenas manos.</span></h1><p class="intro">Extrae los artículos de tu carrito SHEIN y recibe el resultado directamente en Telegram.</p></div>
+<div class="mascot" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 58V44C19 26 32 12 50 12s31 14 31 32v14" fill="#FFDA60" stroke="#EBA93D" stroke-width="3"/><path d="m46 13 4-7 4 7" fill="#EBA93D"/><ellipse cx="38" cy="47" rx="3.3" ry="4" fill="#71442C"/><ellipse cx="62" cy="47" rx="3.3" ry="4" fill="#71442C"/><ellipse cx="28" cy="56" rx="6" ry="3.5" fill="#FAA1A2"/><ellipse cx="72" cy="56" rx="6" ry="3.5" fill="#FAA1A2"/><path d="m45 56 5 6 5-6" fill="#F2943C"/><path d="m11 63 14 8 11-10 14 10 14-10 11 10 14-8-5 24c-17 9-51 9-68 0l-5-24Z" fill="#FFF8EE" stroke="#D8AB8D" stroke-width="3" stroke-linejoin="round"/></svg></div></div>
+<div class="entry"><label for="link">ENLACE DE TU CARRITO SHEIN</label><input id="link" class="field" type="url" inputmode="url" autocomplete="off" placeholder="https://onelink.shein.com/..."><button class="btn primary-action" type="button" id="extract"><span class="button-icon" aria-hidden="true">⚡</span> EXTRAER ARTÍCULOS <span aria-hidden="true">→</span></button><p id="homeStatus" role="status" aria-live="polite">Pega tu enlace y comienza la extracción.</p></div>
+<div class="steps"><div class="step"><strong>1</strong>Pega el enlace</div><div class="step"><strong>2</strong>Extraemos tus artículos</div><div class="step"><strong>3</strong>Recíbelos en el chat</div></div>
+</section>
+<section id="manager" class="panel hidden"><h2>🛒 GESTIONAR CARRITO</h2><p id="status" class="warn">Cargando artículos de tu extracción…</p><input id="search" class="field" placeholder="🔎 Buscar por nombre o ID"><div class="controls"><button class="btn btn2" id="all">☑ Seleccionar todos</button><button class="btn btn2" id="none">☐ Quitar selección</button><button class="btn btn2" id="remove">🗑 Eliminar seleccionados</button></div><div id="count" class="count">0 artículos</div><div id="products"></div><div class="controls"><button class="btn" id="visor">🌐 Generar visor</button><button class="btn" id="csv">📊 Descargar CSV</button></div></section></main><script>
 const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand()}
 const $=id=>document.getElementById(id);let rows=[],selected=new Set();
 $('extract').onclick=()=>{let url=$('link').value.trim();if(!/^https:\/\/([a-z0-9-]+\.)*(shein\.com|shein\.co\.uk)\//i.test(url)){$('homeStatus').textContent='⚠️ Enlace SHEIN inválido';return}if(!(tg&&tg.sendData)){$('homeStatus').textContent='⚠️ Abre esta pantalla desde el menú del bot en Telegram';return}tg.sendData(JSON.stringify({action:'extract',url}));$('homeStatus').textContent='Solicitud enviada. Revisa el chat.'};
